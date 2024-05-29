@@ -24,7 +24,7 @@ public class LoadSliderValues : MonoBehaviour
         {
             var name = EditName(blendshapeData.root[i].name);
             Transform slider = sliderCreator.transform.Find(name + " ");
-            slider.GetComponent<SlidersSets>().SetValue(blendshapeData.root[i].value);
+            slider.GetComponent<SlidersSets>().SetSliderValue(blendshapeData.root[i].value);
         }
     }
 

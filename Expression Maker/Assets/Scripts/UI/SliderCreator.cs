@@ -7,6 +7,7 @@ public class SliderCreator : MonoBehaviour
 {
     public GameObject sliderSetPrefab;
     public SliderAreaExpand sliderAreaExpand;
+    public SlidersSets[] slidersSets;
 
     public void CreateSlider(GameObject humanoid)
     {
@@ -17,6 +18,7 @@ public class SliderCreator : MonoBehaviour
             // Get the SkinnedMeshRenderer component of the humanoid
             SkinnedMeshRenderer skinnedMeshRenderer = humanoid.GetComponentInChildren<SkinnedMeshRenderer>();
 
+            slidersSets = new SlidersSets[skinnedMeshRenderer.sharedMesh.blendShapeCount];
             // Get the blend shapes of the SkinnedMeshRenderer
             int i = 0;
             for (i = 0; i < skinnedMeshRenderer.sharedMesh.blendShapeCount; i++)
@@ -30,6 +32,8 @@ public class SliderCreator : MonoBehaviour
 
                 string editedName = blendShapes[i];
                 sliderSet.gameObject.name = EditName(editedName);
+
+                slidersSets[i] = sliderSet;
             }
 
             sliderAreaExpand.UpdateSliderAreaHeight(i);
@@ -56,6 +60,7 @@ public class SliderCreator : MonoBehaviour
     public void ClearSliders()
     {
         Transform[] children = gameObject.GetComponentsInChildren<Transform>();
+        slidersSets = null;
 
         // Loop through the children and delete them
         foreach (Transform child in children)
@@ -74,7 +79,8 @@ public class SliderCreator : MonoBehaviour
         // Loop through the children and delete them
         foreach (SlidersSets child in children)
         {
-            child.SetValue(value);
+            child.SetSliderValue(value);
+            child.ResetTimeValue();
         }
     }
 }

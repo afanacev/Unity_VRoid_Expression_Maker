@@ -1,13 +1,7 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.UIElements;
-using static UnityEngine.GraphicsBuffer;
-using UnityEngine.Events;
-using UniVRM10.VRM10Viewer;
-using Unity.VisualScripting;
 using System.Linq;
 
 public class SaveExpression : MonoBehaviour
@@ -18,6 +12,8 @@ public class SaveExpression : MonoBehaviour
     public string filePath;
 
     public List<BlendshapeValue> blendshapeList;
+    public SliderCreator sliderCreator;
+    public DropdownsController dropdownsController;
 
     public bool OnSaveClicked()
     {
@@ -69,12 +65,14 @@ public class SaveExpression : MonoBehaviour
         {
             // Get the current blendshape name and value
             string blendShapeName = vrmMesh.sharedMesh.GetBlendShapeName(i);
+            int blendShapeIndex = vrmMesh.sharedMesh.GetBlendShapeIndex(blendShapeName);
             float blendShapeValue = vrmMesh.GetBlendShapeWeight(i);
 
             // If the blendshape value is not 0, add it to the animation clip
             if (blendShapeValue != 0)
             {
-                blendshapeList.Add(new BlendshapeValue(blendShapeName, Mathf.Round(blendShapeValue)));
+                var slidersSets = sliderCreator.slidersSets.First(x => x.blendshapeIndex == blendShapeIndex);
+                blendshapeList.Add(new BlendshapeValue(blendShapeName, Mathf.Round(blendShapeValue), blendShapeIndex, slidersSets.GetTime()));
             }
         }
     }
@@ -84,7 +82,9 @@ public class SaveExpression : MonoBehaviour
     {
         //Because Unity doesn't allow serializing JSON with list directly as its root
         //I have to use a class that contains the list
-        FacialFile facialFile = new FacialFile(blendshapeList);
+        FacialFile facialFile = new FacialFile(blendshapeList, 
+            (CharacterNameEnum)dropdownsController.CharacterNameDropdown.value, 
+            (FaceExpressionEnum)dropdownsController.CharacterNameDropdown.value);
 
         // Serialize the list to a JSON string.
         string json = JsonUtility.ToJson(facialFile);
@@ -102,11 +102,15 @@ public class SaveExpression : MonoBehaviour
 [System.Serializable]
 public class FacialFile
 {
+    public CharacterNameEnum CharacterName;
+    public FaceExpressionEnum EmotionName;
     public List<BlendshapeValue> root;
 
-    public FacialFile(List<BlendshapeValue> blendshapeList)
+    public FacialFile(List<BlendshapeValue> blendshapeList, CharacterNameEnum characterName, FaceExpressionEnum emotionName)
     {
         this.root = blendshapeList;
+        CharacterName = characterName;
+        EmotionName = emotionName;
     }
 }
 
@@ -116,10 +120,14 @@ public class BlendshapeValue
 {
     public string name;
     public float value;
+    public int index;
+    public float time;
 
-    public BlendshapeValue(string name, float value)
+    public BlendshapeValue(string name, float value, int index, float time)
     {
         this.name = name;
         this.value = value;
+        this.index = index;
+        this.time = time;
     }
 }

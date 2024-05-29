@@ -84,14 +84,14 @@ public class UndoStackManager : MonoBehaviour
             logActionList[currentUndoSteps].actionType == ActionType.End)
         {
             float value = logActionList[currentUndoSteps - 1].fromValue;
-            logActionList[currentUndoSteps - 1].sliderSets.SetValue(value);
+            logActionList[currentUndoSteps - 1].sliderSets.SetSliderValue(value);
         }
         //But if the player has Redo before, we just set the value to the current log,
         //no need to read the previous log
         else
         {
             float value = logActionList[currentUndoSteps].fromValue;
-            logActionList[currentUndoSteps].sliderSets.SetValue(value);
+            logActionList[currentUndoSteps].sliderSets.SetSliderValue(value);
         }
         currentUndoSteps--;
 
@@ -116,14 +116,14 @@ public class UndoStackManager : MonoBehaviour
            logActionList[currentUndoSteps].actionType == ActionType.Start)
         {
             float value = logActionList[currentUndoSteps + 1].toValue;
-            logActionList[currentUndoSteps + 1].sliderSets.SetValue(value);
+            logActionList[currentUndoSteps + 1].sliderSets.SetSliderValue(value);
         }
         else
         //But if the player has Undo before, we just set the value to the current log,
         //no need to read the next log
         {
             float value = logActionList[currentUndoSteps].toValue;
-            logActionList[currentUndoSteps].sliderSets.SetValue(value);
+            logActionList[currentUndoSteps].sliderSets.SetSliderValue(value);
         }
         currentUndoSteps++;
 
